@@ -1,5 +1,5 @@
 //This sketch toggles sport mode in the IKM0S MSD81 flash in the absence of a DSCM90 or DSCM80 ZB.
-//Extra features: holding the M button toggles DTC on/off. Memory.
+//Extra features: holding the M button toggles DTC on/off. 
 
 #include <mcp_can.h>
 
@@ -7,7 +7,7 @@ long unsigned int rxId;
 unsigned char len = 0, rxBuf[8];
 int mkey_pressed_counter = 0, i = 0x00;
 byte sndstat = CAN_OK, mkey_normal[] = {0xFF, 0x3F, 0x00}, mkey_pressed[] = {0xBF, 0x7F, 0x00}, dtc_pressed[] = {0xFD, 0xFF}, dtc_normal[] = {0xFC, 0xFF};
-bool ignition_on = false;
+bool ignition = false;
 
 MCP_CAN CAN0(10);                                // CS. Adapt to your board
 #define CAN0_INT 2                               // INT. Adapt to your board
@@ -19,12 +19,12 @@ void setup() {
 
   pinMode(CAN0_INT, INPUT);                             // Configuring pin for /INT input, pin 2
 
-  CAN0.init_Mask(0,0,0x07FF0000);                // Mask matches: 07FF (standard ID) and only first byte FF
-  CAN0.init_Filt(0,0,0x01300000);                // Filter, ignition
-
+  CAN0.init_Mask(0,0,0x07FFFFFF);                // Mask matches: 07FF (standard ID), first byte FF, second byte FF
   CAN0.init_Mask(1,0,0x07FFFFFF);                // Mask matches: 07FF (standard ID), first byte FF, second byte FF
-  CAN0.init_Filt(2,0,0x01D6C00C);                // Filter, no MFL key pressed.
-  CAN0.init_Filt(3,0,0x01D6C04C);                // Filter, source key pressed
+  
+  CAN0.init_Filt(0,0,0x01304550);                // Filter, ignition on
+  CAN0.init_Filt(1,0,0x01D6C00C);                // Filter, no MFL key pressed.
+  CAN0.init_Filt(2,0,0x01D6C04C);                // Filter, source key pressed
 
   
   CAN0.setMode(MCP_NORMAL);
@@ -34,24 +34,23 @@ void loop() {
   if (!digitalRead(CAN0_INT)) {                         // If pin 2 is low, read receive buffer
     CAN0.readMsgBuf(&rxId, &len, rxBuf);                // Read data: len = data length, buf = data byte(s)
 
-    if (rxId == 0x130) {
-      if (rxBuf[0] == 0x45) ignition_on = true;
-      else ignition_on = false;
-    }
-
-    else if (rxId == 0x1D6) {                           // MFL actions
-      if (ignition_on) {
-        if (rxBuf[1] == 0x0C) {
-          send_mkeyidle();
-          mkey_pressed_counter = 0;
-        } else {
-          send_mkeypress();
-          mkey_pressed_counter++;
-          if (mkey_pressed_counter == 6) {
-            send_dtc();
+    switch(rxId) {
+      case 0x130:                                       // Toggle ignition
+        if (rxBuf[0] == 0x45) ignition = true;
+        else ignition = false;
+      case 0x1D6:                                       // MFL actions
+        if (ignition) {
+          if (rxBuf[1] == 0x0C) {
+            send_mkeyidle();
+            mkey_pressed_counter = 0;
+          } else {
+            send_mkeypress();
+            mkey_pressed_counter++;
+            if (mkey_pressed_counter == 6) {
+              send_dtc();
+            }
           }
         }
-      }
     }
   }
 }
