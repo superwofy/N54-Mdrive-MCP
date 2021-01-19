@@ -1,17 +1,19 @@
 //This sketch toggles sport mode in the IKM0S MSD81 flash in the absence of a DSCM90 or DSCM80 ZB.
 //Extra features: holding the M button toggles DTC on/off.
+//Configured for Longan Serial Can 1.2
+//Toggle debug serial messages from line 39 of mcp_can_dfs.h
 
                                                     
 #define CAN0_INT 2                                  // INT. Adapt to your board
 #define DTC_CONTROL 1                               // Enable/Disable DTC toggling with M key
 
 #include "src/mcp_can.h"
-MCP_CAN CAN0(10);                                   // CS. Adapt to your board
+MCP_CAN CAN0(9);                                   // CS. Adapt to your board
 
 long unsigned int rxId;
 unsigned char rxBuf[8];
-int i = 0x00;
-byte sndstat, mkey_idle[] = {0xFF, 0x3F, 0x00}, mkey_pressed[] = {0xBF, 0x7F, 0x00};
+int checksum = 0xF0;
+byte sndstat, mkey_idle[] = {0xFF, 0x3F, 0xF0}, mkey_pressed[] = {0xBF, 0x7F, 0xF0};
 #if DTC_CONTROL
 byte dtc_pressed[] = {0xFD, 0xFF}, dtc_idle[] = {0xFC, 0xFF};
 int mkey_pressed_counter = 0;
@@ -51,7 +53,7 @@ void loop() {   //Simply broadcast 1D9 as long as the PT-CAN is active.
 }
 
 void send_mkey_idle() {
-  mkey_idle[2] = i;
+  mkey_idle[2] = checksum;
   sndstat = CAN0.sendMsgBuf(0x1D9, 3, mkey_idle);
   
   while (sndstat != CAN_OK) {
@@ -61,15 +63,15 @@ void send_mkey_idle() {
 #endif
     sndstat = CAN0.sendMsgBuf(0x01D9, 3, mkey_idle);
   }
-  i++;
-  if (i == 0x100) i = 0x00;                             // i is used as the message counter
+  checksum++;
+  if (checksum == 0x100) checksum = 0xF0;                             // Checksum is between F0..FF
 #if DTC_CONTROL
   mkey_pressed_counter = 0;
 #endif
 }
 
 void send_mkey_pressed() {
-  mkey_pressed[2] = i;
+  mkey_pressed[2] = checksum;
   sndstat = CAN0.sendMsgBuf(0x01D9, 3, mkey_pressed);
   while (sndstat != CAN_OK) {
   #if DEBUG_MODE
@@ -77,8 +79,8 @@ void send_mkey_pressed() {
   #endif
     sndstat = CAN0.sendMsgBuf(0x01D9, 3, mkey_pressed);
   }
-  i++;
-  if (i == 0x100) i = 0x00;
+  checksum++;
+  if (checksum == 0x100) checksum = 0xF0;
 #if DTC_CONTROL
   mkey_pressed_counter++;
 #endif
