@@ -1,0 +1,37 @@
+
+Message structure (Left to right):
+
+counter
+
+Drivelogic unchanged:
+DSC off 0x05
+DSC on 0x09
+DSC MDM 0x11
+DSC unchaged 0x01
+
+Drivelogic S5
+DSC 0x45
+0x49(on) 
+0x51(MDM) 
+0x41(Unchanged)
+
+
+POWER: 0x15(Normal) 0x25(Sport) 0x35(Sport Plus) 0x05(Unchanged) 
+EDC: 0x21(Comfort) 0x22(Normal) 0x2A(Sport) 0x20(Unchanged)
+Servotronic: 0x41(Normal) 0x81(Sport)
+Shift lights: 0x8F(Off) 0x97(On) 0x87 (Unchanged)
+
+
+
+Timing:
+
+when idling (no changes) it is seen every 10 seconds (on KCAN)
+
+when making a change, three are sent with increasing counter.
+
+counter increases by 0x11
+
+e.g:
+15:53:43.116 -> Standard ID: 0x399       DLC: 6  Data: 0x2E 0x51 0x35 0x2A 0x81 0x97
+15:53:43.252 -> Standard ID: 0x399       DLC: 6  Data: 0x3F 0x51 0x35 0x2A 0x81 0x97
+15:53:43.420 -> Standard ID: 0x399       DLC: 6  Data: 0x40 0x51 0x35 0x2A 0x81 0x97

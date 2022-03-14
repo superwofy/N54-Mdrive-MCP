@@ -1,0 +1,25 @@
+16:15:46.784 -> Entering Configuration Mode Successful!
+16:15:46.817 -> Setting Baudrate Successful!
+16:15:46.817 -> MCP2515 Initialized Successfully!
+16:15:46.817 -> MCP2515 Library Receive Example...
+16:19:27.844 -> Standard ID: 0x206       DLC: 2  Data: 0x86 0x3E		each one of these turns on one segment including reds
+16:19:28.013 -> Standard ID: 0x206       DLC: 2  Data: 0x86 0x3E
+16:19:28.115 -> Standard ID: 0x206       DLC: 2  Data: 0xB6 0x00		turns on segments sequentially all the way
+16:19:28.251 -> Standard ID: 0x206       DLC: 2  Data: 0xB6 0x00
+16:19:28.421 -> Standard ID: 0x206       DLC: 2  Data: 0xB6 0x00
+16:19:28.930 -> Standard ID: 0x206       DLC: 2  Data: 0x05 0x00		this turns it off
+16:19:29.099 -> Standard ID: 0x206       DLC: 2  Data: 0x05 0x00
+16:19:29.235 -> Standard ID: 0x206       DLC: 2  Data: 0x05 0x00
+
+
+
+
+
+16:40:26.256 -> Standard ID: 0x206       DLC: 2  Data: 0x86 0x3E
+16:40:26.290 -> Standard ID: 0x206       DLC: 2  Data: 0x05 0x00
+16:40:26.459 -> Standard ID: 0x206       DLC: 2  Data: 0x05 0x00
+16:40:26.629 -> Standard ID: 0x206       DLC: 2  Data: 0x05 0x00
+16:40:27.545 -> Standard ID: 0x206       DLC: 2  Data: 0x86 0x3E
+16:40:27.646 -> Standard ID: 0x206       DLC: 2  Data: 0xB6 0x00
+16:40:27.816 -> Standard ID: 0x206       DLC: 2  Data: 0xB6 0x00
+16:40:27.952 -> Standard ID: 0x206       DLC: 2  Data: 0xB6 0x00
